@@ -12,18 +12,20 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('ProfileMovil', [UsuariosController::class, 'ProfileMovil']);
     Route::post('LogOutMovil', [UsuariosController::class, 'LogOutMovil']);
     
-    // Loan routes
+    // Loan routes – rutas específicas ANTES que las rutas con parámetros dinámicos
     Route::post('loans/calculate', [LoanController::class, 'calculate']);
     Route::post('loans/request', [LoanController::class, 'store']);
     Route::get('loans/my', [LoanController::class, 'myLoans']);
     Route::get('loans/stats', [LoanController::class, 'stats']);
     Route::get('loans/pending', [LoanController::class, 'pending']);
     Route::get('loans/all', [LoanController::class, 'allLoans']);
-    Route::get('loans/{id}', [LoanController::class, 'show']);
-    Route::post('loans/{id}/approve', [LoanController::class, 'approve']);
-    Route::post('loans/{id}/reject', [LoanController::class, 'reject']);
-    Route::post('loans/{id}/pay-installment', [LoanController::class, 'payInstallment']);
-    Route::post('loans/{id}/pay-full', [LoanController::class, 'payFull']);
+
+    // Rutas con {id} SIEMPRE al final para no interferir con las anteriores
+    Route::get('loans/{id}', [LoanController::class, 'show'])->whereNumber('id');
+    Route::post('loans/{id}/approve', [LoanController::class, 'approve'])->whereNumber('id');
+    Route::post('loans/{id}/reject', [LoanController::class, 'reject'])->whereNumber('id');
+    Route::post('loans/{id}/pay-installment', [LoanController::class, 'payInstallment'])->whereNumber('id');
+    Route::post('loans/{id}/pay-full', [LoanController::class, 'payFull'])->whereNumber('id');
 });
 
 Route::get('/test-api-connection', function () {
