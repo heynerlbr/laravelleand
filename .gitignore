@@ -17,6 +17,9 @@ yarn-error.log
 /*.zip
 /*.sql
 /public/*.zip
+/public_html/*
+/public_html
+/public
 
 # Individual files in storage can be ignored, but keep the directory structure
 /storage/app/public/*

@@ -273,13 +273,38 @@ class LoanController extends Controller
         ]);
     }
 
-    public function allLoans()
+    public function allLoans(Request $request)
     {
-        // Solo debería ser accesible por admins, pero aquí devolvemos todo con el usuario relacionado
-        $loans = Loan::with('user')->orderBy('created_at', 'desc')->get();
+        $query = Loan::with(['user', 'installments'])->orderBy('created_at', 'desc');
+
+        // Filtro por estado
+        if ($request->has('status') && $request->status !== 'all') {
+            $query->where('status', $request->status);
+        }
+
+        // Filtro por nombre o email del usuario
+        if ($request->has('search') && $request->search !== '') {
+            $search = $request->search;
+            $query->whereHas('user', function($q) use ($search) {
+                $q->where('name', 'like', "%{$search}%")
+                  ->orWhere('email', 'like', "%{$search}%");
+            });
+        }
+
+        $loans = $query->get();
+
         return response()->json([
             'status' => 'ok',
             'loans' => $loans
+        ]);
+    }
+
+    public function show($id)
+    {
+        $loan = Loan::with(['user', 'installments'])->findOrFail($id);
+        return response()->json([
+            'status' => 'ok',
+            'loan' => $loan
         ]);
     }
 }
